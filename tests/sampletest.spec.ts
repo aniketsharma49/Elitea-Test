@@ -17,3 +17,8 @@ test('EPAM homepage: should display "epam" text', async ({ page }) => {
   // Validate that the page contains the text "epam" (case-insensitive)
   await expect(page.getByText(/epam/i).first()).toBeVisible();
 });
+  // Validate that the page contains "epam" (case-insensitive).
+  // Using role-based locator for stability (logo link is reliably visible).
+  await expect(
+    page.getByRole('link', { name: /epam/i }).first()
+  ).toBeVisible();
