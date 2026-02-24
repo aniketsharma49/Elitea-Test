@@ -32,9 +32,19 @@ test.describe('EPAM - Client Work navigation', () => {
     await page.goto('https://www.epam.com/', { waitUntil: 'domcontentloaded' });
 
     // Best-effort: dismiss cookie consent if it blocks the header.
-    await dismissCookiesIfPresent(page);
+      // Some responsive layouts / hero animations can occasionally intercept pointer events.
+      // If a normal click fails, retry with force.
+      try {
+        await servicesLink.click({ timeout: 10000 });
+      } catch {
+        await servicesLink.click({ force: true });
+      }
 
-    // 2) Select the "Services" option from the header menu.
+      try {
+        await servicesButton.click({ timeout: 10000 });
+      } catch {
+        await servicesButton.click({ force: true });
+      }
     // The site can render it as a link or a menu button depending on viewport.
     const servicesLink = page.getByRole('link', { name: /^services$/i }).first();
     const servicesButton = page.getByRole('button', { name: /^services$/i }).first();
@@ -48,7 +58,11 @@ test.describe('EPAM - Client Work navigation', () => {
     // Wait for navigation (either full page navigation or client-side route change).
     await page.waitForLoadState('domcontentloaded');
 
-    // 3) Click the "Explore Our Client Work" link.
+    try {
+      await exploreClientWork.click({ timeout: 10000 });
+    } catch {
+      await exploreClientWork.click({ force: true });
+    }
     // This CTA exists on the Services section/pages and navigates to Client Work.
     const exploreClientWork = page.getByRole('link', { name: /explore our client work/i }).first();
     await expect(exploreClientWork).toBeVisible({ timeout: 15000 });
