@@ -1,4 +1,81 @@
 /**
+ * Playwright Automation Script: Part Creation Menu Access
+ * 
+ * Smoke Test — Scenario 1 (Selected for smoke testing):
+ *   Entity: Accessing the Part Creation Menu
+ *   Precondition: User is logged in with "create" permission for the Part group.
+ *
+ * Covers:
+ *   - Positive: "Add Parts" dropdown is visible and contains correct menu items.
+ *   - Negative: Verifies menu items "Create Part" and "Import from File" are present in dropdown.
+ *
+ * Framework: Playwright (TypeScript)
+ * Target URL: https://demo.inventree.org
+ */
+
+import { test, expect } from '@playwright/test';
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+const BASE_URL = 'https://demo.inventree.org';
+const USERNAME  = 'engineer';
+const PASSWORD  = 'partsonly';
+const PARTS_URL = `${BASE_URL}/web/part/category/index/parts`;
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+async function login(page: any) {
+  await page.goto(`${BASE_URL}/web/`);
+  const loggedIn = await page
+    .getByRole('tab', { name: 'Parts' })
+    .isVisible()
+    .catch(() => false);
+
+  if (!loggedIn) {
+    await page.getByLabel(/username/i).fill(USERNAME);
+    await page.getByLabel(/password/i).fill(PASSWORD);
+    await page.getByRole('button', { name: /log in/i }).click();
+    await page.waitForURL(`${BASE_URL}/web/**`, { timeout: 15_000 });
+  }
+}
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
+test.describe('Part Creation Menu — Access & Visibility', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    await page.goto(PARTS_URL, { waitUntil: 'networkidle' });
+  });
+
+  test('TC-MENU-01 | "Add Parts" dropdown is visible for authorised user', async ({ page }) => {
+    const addPartsBtn = page.getByRole('button', { name: 'action-menu-add-parts' });
+    await expect(addPartsBtn).toBeVisible({ timeout: 10_000 });
+    await expect(addPartsBtn).toBeEnabled();
+  });
+
+  test('TC-MENU-02 | "Add Parts" dropdown contains "Create Part" and "Import from File"', async ({ page }) => {
+    const addPartsBtn = page.getByRole('button', { name: 'action-menu-add-parts' });
+    await addPartsBtn.click();
+
+    const createPartItem = page.getByRole('menuitem', { name: /create part/i });
+    await expect(createPartItem).toBeVisible({ timeout: 5_000 });
+
+    const importFileItem = page.getByRole('menuitem', { name: /import from file/i });
+    await expect(importFileItem).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('TC-MENU-03 | Clicking "Create Part" opens the "Add Part" modal dialog', async ({ page }) => {
+    const addPartsBtn = page.getByRole('button', { name: 'action-menu-add-parts' });
+    await addPartsBtn.click();
+
+    const createPartItem = page.getByRole('menuitem', { name: /create part/i });
+    await createPartItem.click();
+
+    const dialog = page.getByRole('dialog', { name: /add part/i });
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    await expect(dialog.getByRole('heading', { name: /add part/i })).toBeVisible();
+
+    await dialog.getByRole('button', { name: /cancel/i }).click();
+    await expect(dialog).toBeHidden({ timeout: 5_000 });
+  });
+});
  * Test Suite: Accessing the Part Creation Menu
  * Scenario: Sub-Page/Component 1 — Creating a Part
  * Entity/Objective: Accessing the Part Creation Menu
