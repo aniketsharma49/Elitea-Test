@@ -9,9 +9,9 @@ targeting the [InvenTree Demo Server](https://demo.inventree.org).
 
 | File | Scenarios Covered |
 |------|-------------------|
-| `part_creation_workflow.spec.ts` | **SMOKE TEST** — Full end-to-end part creation workflow + form structure validation |
-| `part_creation_menu.spec.ts` | Accessing the Part Creation Menu (positive & negative permission scenarios) |
-| `part_create_form_required_fields.spec.ts` | Create Part Form — required fields, blank-name validation, duplicate name edge case |
+| `part_creation_menu.spec.ts` | **[SMOKE TEST]** Accessing the Part Creation Menu — dropdown visibility, menu items, dialog open/close |
+| `part_creation_form.spec.ts` | Create Part Form — positive creation, required-field validation, field presence |
+| `part_creation_negative.spec.ts` | Negative & boundary — blank name, cancel, disabled bulk-actions, required asterisk, Active default |
 
 ---
 
